@@ -5,6 +5,7 @@ const User = require('../models/user')
 // const db = 'mongodb://sharad:sharadpawar1989@ds143262.mlab.com:43262/rentdb'
 const db = 'mongodb://sharad:sharadpawar1989@ds141043.mlab.com:41043/contentwriters_db'
 const jwt = require('jsonwebtoken')
+const stringUtil = require('../helper/stringUtil')
 const nodemailer = require('nodemailer');
 mongoose.connect(db, err => {
     if(err){
@@ -32,6 +33,35 @@ mongoose.connect(db, err => {
 router.get('/', (req, res) => {
     res.send('From API Route')
 })
+/* Get Profile Info */
+router.get('/profile', (req, res) => {
+   let email = stringUtil.sanitizeInput(req.query.email)
+    User.findOne({email:req.query.email}).exec(function(err,userProfile){
+       if(err){
+        res.status(400).send(err)
+       }
+    res.status(201).send(userProfile)
+   })
+})
+
+router.post('/profile',(req,res)=>{
+    let userData = stringUtil.sanitizeInput(req.body)
+    let user = new User(userData)
+    let email = stringUtil.sanitizeInput(req.headers['email'])
+    
+    user.updateOne({email:email},)
+
+   
+    /*user.updateOne((error,registeredUser) => {
+        if(error){
+            res.status(400).send(error)
+        }else {
+            let payload = {subject: user._id}
+            let token = jwt.sign(payload, 'secretkey')
+            res.status(200).send(email)            
+        }
+    }) */
+ })
 
 router.post('/register',(req,res)=>{
    let userData = req.body
