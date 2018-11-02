@@ -1,11 +1,19 @@
 const express = require('express')
 const router = express.Router()
-const mongoose = require('../helper/db')
+const mongoose = require('mongoose')
 const User = require('../models/user')
+// const db = 'mongodb://sharad:sharadpawar1989@ds143262.mlab.com:43262/rentdb'
+const db = 'mongodb://sharad:sharadpawar1989@ds141043.mlab.com:41043/contentwriters_db'
 const jwt = require('jsonwebtoken')
 const stringUtil = require('../helper/stringUtil')
 const nodemailer = require('nodemailer');
-
+mongoose.connect(db, err => {
+    if(err){
+        console.error('Error!'+ err)
+    } else {
+        console.log('connected to mongoDB')
+    }
+})
 /* var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -50,9 +58,8 @@ router.post('/register',(req,res)=>{
    let user = new User(userData)
   
    user.save((error,registeredUser) => {
-    try{
        if(error){
-        res.status(401).send({"ErrorCode":error.code ,  "ErrorMsg":error.errmsg})
+           res.status(400).send(error)
        }else {
            let payload = {subject: user._id}
            let token = jwt.sign(payload, 'secretkey')
@@ -66,22 +73,18 @@ router.post('/register',(req,res)=>{
           res.status(201).send({token})
            
        }
-    } catch(error){
-        res.status(500).send({"ErrorCode": "500" ,  "ErrorMsg":"Internal Server Error" })
-    }
    })
 })
 
 router.post('/login',(req,res)=>{
     let userData = req.body
-    
     User.findOne({email:userData.email}, (error, user) => {
-        try{
         if(error){
+            console.log('here')
             res.status(500).send('something went wrong')
         } else{
             if(!user){
-                res.status(401).send({"ErrorCode": "401" ,  "ErrorMsg":"Invalid Email"+ user.email })
+                res.status(401).send('invalid email')
             } else {
                if( user.password !== userData.password){
                    res.status(401).send('invalid password')               
@@ -92,11 +95,7 @@ router.post('/login',(req,res)=>{
                 }
             }
         }
-    } catch(error){
-        res.status(500).send({"ErrorCode": "500" ,  "ErrorMsg":"Internal Server Error" })
-    }
     })
-
  })
 
  function verfifyToken(req,res,next){

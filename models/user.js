@@ -13,7 +13,9 @@ const UserSchema = new schema ({
         unique: true,
         required:true
     },
-    userType: String,
+    userType:{ type: String,
+        required:true
+    },
     firstName: String,
     lastName: String,
     phone: String,
