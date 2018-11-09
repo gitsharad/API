@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const fs = require('fs')
 const port = 3000
 const app = express()
 app.use(cors())
@@ -9,7 +10,10 @@ app.use(bodyParser.json())
 app.use('/api',api)
 
 app.get('/',function (req, res){
-    res.send('Hello From api')
+    
+    html = fs.readFileSync('index.html');
+    res.write(html)
+    res.end()
 })  
 
 app.listen(port,function(){

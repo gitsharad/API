@@ -4,8 +4,6 @@ const mongoose = require('../helper/db')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 const stringUtil = require('../helper/stringUtil')
-const nodemailer = require('nodemailer');
-
 /* var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -26,36 +24,43 @@ router.get('/', (req, res) => {
     res.send('From API Route')
 })
 /* Get Profile Info */
-router.get('/profile', (req, res) => {
-   let email = stringUtil.sanitizeInput(req.query.email)
+router.get('/profile',verfifyToken, (req, res) => {
+    console.log('req',req.query)
+   var email = stringUtil.sanitizeInput(req.query.email)
     User.findOne({email:req.query.email}).exec(function(err,userProfile){
        if(err){
         res.status(400).send(err)
        }
-    res.status(201).send(userProfile)
+       console.log('hiii',userProfile)
+       res.status(201).send(userProfile)
    })
 })
 
-/*router.post('/profile',(req,res)=>{
-    let userData = stringUtil.sanitizeInput(req.body)
-    let user = new User(userData)
-    let email = stringUtil.sanitizeInput(req.headers['email'])
+router.post('/profile',verfifyToken,(req,res)=>{
+    var userData = stringUtil.sanitizeInput(req.body)
+    var email = stringUtil.sanitizeInput(req.headers['email'])
     
-    user.findAndUpdate({email:email},userData)
+    User.findOneAndUpdate({email: email}, {$set:userData},function(err, doc){
+        if(err){
+            res.status(401).send({"ErrorCode":err.code ,  "ErrorMsg":err.errmsg})
+        }
+    
+        res.status(200).send({email})
+    });
 
- }) */
+ })
 
 router.post('/register',(req,res)=>{
-   let userData = req.body
-   let user = new User(userData)
+   var userData = req.body
+   var user = new User(userData)
   
    user.save((error,registeredUser) => {
     try{
        if(error){
         res.status(401).send({"ErrorCode":error.code ,  "ErrorMsg":error.errmsg})
        }else {
-           let payload = {subject: user._id}
-           let token = jwt.sign(payload, 'secretkey')
+           var payload = {subject: user._id}
+           var token = jwt.sign(payload, 'secretkey')
          /*  transporter.sendMail(mailOptions, function(error, info){
             if (error) {
               console.log(error);
@@ -73,7 +78,7 @@ router.post('/register',(req,res)=>{
 })
 
 router.post('/login',(req,res)=>{
-    let userData = req.body
+    var userData = req.body
     
     User.findOne({email:userData.email}, (error, user) => {
         try{
@@ -81,13 +86,13 @@ router.post('/login',(req,res)=>{
             res.status(500).send('something went wrong')
         } else{
             if(!user){
-                res.status(401).send({"ErrorCode": "401" ,  "ErrorMsg":"Invalid Email"+ user.email })
+                res.status(401).send({"ErrorCode": "401" ,  "ErrorMsg":"Invalid Email"})
             } else {
                if( user.password !== userData.password){
-                   res.status(401).send('invalid password')               
+                   res.status(401).send({"ErrorCode": "401" ,  "ErrorMsg":"Invalid Password"})              
                 } else {
-                    let payload = {subject: user._id}
-                    let token = jwt.sign(payload, 'secretkey')         
+                    var payload = {subject: user._id}
+                    var token = jwt.sign(payload, 'secretkey')         
                     res.status(200).send({token})
                 }
             }
@@ -103,10 +108,10 @@ router.post('/login',(req,res)=>{
      if(!req.headers.authorization){
          return res.status(401).send('Unauthorized Reguest');
      }
-     let token = req.headers.authorization.split(' ')[1];
+     var token = req.headers.authorization.split(' ')[1];
      if(token === null )
      {return res.status(401).send('Unauthorized Reguest');}
-     let payLoad = jwt.verify(token,'secretKey');
+     var payLoad = jwt.verify(token,'secretKey');
      if(!payLoad){
         return res.status(401).send('Unauthorized Reguest');
      }
