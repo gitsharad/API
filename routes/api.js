@@ -24,21 +24,19 @@ router.get('/', (req, res) => {
     res.send('From API Route')
 })
 /* Get Profile Info */
-router.get('/profile',verfifyToken, (req, res) => {
-    console.log('req',req.query)
-   var email = stringUtil.sanitizeInput(req.query.email)
-    User.findOne({email:req.query.email}).exec(function(err,userProfile){
+router.get('/profile', (req, res) => {
+  var email = stringUtil.sanitizeInput(req.query.email)
+    User.findOne({email: email}).exec(function(err,userProfile){
        if(err){
         res.status(400).send(err)
        }
-       console.log('hiii',userProfile)
        res.status(201).send(userProfile)
    })
 })
 
-router.post('/profile',verfifyToken,(req,res)=>{
-    var userData = stringUtil.sanitizeInput(req.body)
-    var email = stringUtil.sanitizeInput(req.headers['email'])
+router.post('/profile',(req,res)=>{
+    // var userData = stringUtil.sanitizeInput(req.body)
+    var email = stringUtil.sanitizeInput(req.body['email'])
     
     User.findOneAndUpdate({email: email}, {$set:userData},function(err, doc){
         if(err){
@@ -93,7 +91,7 @@ router.post('/login',(req,res)=>{
                 } else {
                     var payload = {subject: user._id}
                     var token = jwt.sign(payload, 'secretkey')         
-                    res.status(200).send({token})
+                    res.status(200).send({"token":token, "userType":user.userType})
                 }
             }
         }
