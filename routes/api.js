@@ -1,11 +1,15 @@
 const express = require('express')
 const router = express.Router()
-const User = require('../models/user')
+const User = require('../models/userModel')
 const mongoose = require('../helper/db')
 const jwt = require('jsonwebtoken')
 const stringUtil = require('../helper/stringUtil')
 const updateUtil = require('../helper/crudutil')
 const nodemailer = require('nodemailer')
+
+const product = require('./product')
+
+
  var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -21,10 +25,21 @@ const nodemailer = require('nodemailer')
     text: 'That was easy!'
   }; 
  
-  
+ 
 router.get('/', (req, res) => {
     res.send('From API Route')
 })
+
+ 
+// Product Apis
+router.get('/products', (req, res) => {
+    product.getProducts(req,res)
+})
+
+
+
+// User Route APis
+
 /* Get Profile Info */
 router.get('/profile', (req, res) => {
 try {
@@ -131,18 +146,19 @@ router.post('/login',(req,res)=>{
                if( user.password !== userData.password){
                    res.status(401).send({"ErrorCode": "401" ,  "ErrorMsg":"Invalid Password"})              
                 } else {
-                    
+                    /*
                        transporter.sendMail(mailOptions, function(error, info){
                                 if (error) {
                                 console.log(error);
                                 } else {
                                 console.log('mail gela re')
                                    
-                                }
-                                var payload = {subject: user._id}
-                                var token = jwt.sign(payload, 'secretkey')         
-                                res.status(200).send({"token":token, "userType":user.userType})
-                            }); 
+                                } 
+                                
+                            }); */
+                            let payload = {subject: user._id}
+                            let token = jwt.sign(payload, 'secretkey')         
+                            res.status(200).send({"token":token, "userType":user.userType})
                    
                 }
             }
