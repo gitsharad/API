@@ -1,10 +1,12 @@
 const express = require('express')
 const router = express.Router()
-const mongoose = require('../helper/db')
 const User = require('../models/user')
+const mongoose = require('../helper/db')
 const jwt = require('jsonwebtoken')
 const stringUtil = require('../helper/stringUtil')
-/* var transporter = nodemailer.createTransport({
+const updateUtil = require('../helper/crudutil')
+const nodemailer = require('nodemailer')
+ var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: 'ssspawar25@gmail.com',
@@ -17,26 +19,31 @@ const stringUtil = require('../helper/stringUtil')
     to: 'ssspawar25@gmail.com',
     subject: 'Sending Email using Node.js',
     text: 'That was easy!'
-  }; */
-  
+  }; 
+ 
   
 router.get('/', (req, res) => {
     res.send('From API Route')
 })
 /* Get Profile Info */
 router.get('/profile', (req, res) => {
-  var email = stringUtil.sanitizeInput(req.query.email)
+try {
+  var email = stringUtil.sanitizeInput(req.query.email,true)
     User.findOne({email: email}).exec(function(err,userProfile){
        if(err){
         res.status(400).send(err)
        }
        res.status(201).send(userProfile)
    })
+} catch(error){
+    res.status(500).send({"ErrorCode": "500" ,  "ErrorMsg":"Internal Server Error" })
+}
 })
 
 router.post('/profile',(req,res)=>{
-    // var userData = stringUtil.sanitizeInput(req.body)
-    var email = stringUtil.sanitizeInput(req.body['email'])
+    try{
+    var userData = stringUtil.sanitizeInput(req.body,true)
+    var email = stringUtil.sanitizeInput(req.body['email'],true)
     
     User.findOneAndUpdate({email: email}, {$set:userData},function(err, doc){
         if(err){
@@ -45,8 +52,43 @@ router.post('/profile',(req,res)=>{
     
         res.status(200).send({email})
     });
+} catch(error){
+    console.log('error',error)
+    res.status(500).send({"ErrorCode": "500" ,  "ErrorMsg":"Internal Server Error" })
+}
+})
 
- })
+router.post('/changepassword',(req,res)=>{
+    changePassword(req,res)
+})
+
+var changePassword = async function changePassword(req,res){
+    var userData =stringUtil.sanitizeInput(req.body,false)
+    try {
+      let user =  await User.findOne({email:userData.email}) 
+       if(user === null){
+        res.status(401).send({"ErrorCode": "401" ,  "ErrorMsg":"Invalid Email"})
+       }
+       else {
+        if( user.password  !== userData.currentPassword){
+            res.status(401).send({"ErrorCode": "401" ,  "ErrorMsg":"Invalid Current Password"})              
+         } else { 
+             try{
+             var updateData = {"password": userData.newPassword}
+             var returnData = await updateUtil.updateData(updateData,{"email": userData.email})
+             res.status(200).send(returnData)
+             } catch(err){
+                 console.log('err',err)
+                 res.status(500).send({"ErrorCode": err.code ,  "ErrorMsg": err.errmsg })
+             }
+         }
+     }
+    
+    } catch(error){
+        res.status(500).send({"ErrorCode": "500" ,  "ErrorMsg":"Internal Server Error" })
+    }
+}
+
 
 router.post('/register',(req,res)=>{
    var userData = req.body
@@ -89,9 +131,19 @@ router.post('/login',(req,res)=>{
                if( user.password !== userData.password){
                    res.status(401).send({"ErrorCode": "401" ,  "ErrorMsg":"Invalid Password"})              
                 } else {
-                    var payload = {subject: user._id}
-                    var token = jwt.sign(payload, 'secretkey')         
-                    res.status(200).send({"token":token, "userType":user.userType})
+                    
+                       transporter.sendMail(mailOptions, function(error, info){
+                                if (error) {
+                                console.log(error);
+                                } else {
+                                console.log('mail gela re')
+                                   
+                                }
+                                var payload = {subject: user._id}
+                                var token = jwt.sign(payload, 'secretkey')         
+                                res.status(200).send({"token":token, "userType":user.userType})
+                            }); 
+                   
                 }
             }
         }
@@ -116,6 +168,8 @@ router.post('/login',(req,res)=>{
      req.userId = payLoad.subject;
      next()
  }
+
+ 
  
 
 module.exports = router

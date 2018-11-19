@@ -10,7 +10,6 @@ const UserSchema = new schema ({
         required:true
     } ,
     password: { type: String,
-        unique: true,
         required:true
     },
     userType:{ type: String,
