@@ -13,7 +13,7 @@ var sanitizeInput = function sanitizeInput (input, upperCase) {
   if (_.isObject(input)) {
     var upperObj = _.transform(input, function (result, val, key) {
      if (!(typeof val === 'number' || typeof input === 'boolean')) {
-        result[key] = upperCase ? val.trim().toUpperCase() : val.trim()
+       result[key] = upperCase ? val.trim().toUpperCase() : val.trim()
       } else {
         result[key] = val
       }
@@ -37,5 +37,4 @@ var sanitizeInputForRegex = function sanitizeInputForRegex (input, upperCase) {
 module.exports = {
  sanitizeInput: sanitizeInput,
  sanitizeInputForRegex: sanitizeInputForRegex
- 
 }

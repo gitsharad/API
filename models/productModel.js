@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
-
+const shortid = require('shortid')
+shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
 const schema = mongoose.Schema
 
 const ProductSchema = new schema ({
@@ -9,6 +10,10 @@ const ProductSchema = new schema ({
         uppercase: true,
         required:true
     } ,
+    _id: {
+        default:shortid.generate(),
+        type: String
+    },
     rate: { type: Number,
         required:true
     },

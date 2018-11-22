@@ -8,6 +8,7 @@ const updateUtil = require('../helper/crudutil')
 const nodemailer = require('nodemailer')
 
 const product = require('./product')
+const Order = require('./orders')
 
 
  var transporter = nodemailer.createTransport({
@@ -36,7 +37,14 @@ router.get('/products', (req, res) => {
     product.getProducts(req,res)
 })
 
+// Orders Apis
+router.post('/addorder',(req,res) => {
+    Order.setOrder(req,res)
+})
 
+router.get('/getorders',(req,res) => {
+    Order.getOrders(req,res)
+})
 
 // User Route APis
 
