@@ -11,22 +11,26 @@ const product = require('./product')
 const Order = require('./orders')
 
 
- var transporter = nodemailer.createTransport({
-    service: 'gmail',
+  var transporter = nodemailer.createTransport({
+    host: 'mail.globalcontentwriters.com',
+    port: 587,
+    secure: false,
     auth: {
-      user: 'ssspawar25@gmail.com',
-      pass: 'SharadPawar@1989'
+      user: 'support@globalcontentwriters.com',
+      pass: 'prashant@1234'
+    },
+    tls:{
+        rejectUnauthorized:false
     }
   });
   
-  var mailOptions = {
-    from: 'ssspawar25@gmail.com',
+  var mailOptions = { 
+    from: '"GCW" <support@globalcontentwriters.com>',
     to: 'ssspawar25@gmail.com',
     subject: 'Sending Email using Node.js',
-    text: 'That was easy!'
+    text: `<p>You have successfully Register With GCW.</p>`
   }; 
- 
- 
+
 router.get('/', (req, res) => {
     res.send('From API Route')
 })
@@ -37,19 +41,23 @@ router.get('/products', (req, res) => {
     product.getProducts(req,res)
 })
 
+router.get('/addproduct', (req, res) => {
+    product.setProduct(req,res)
+})
+
 // Orders Apis
-router.post('/addorder',(req,res) => {
+router.post('/addorder',verfifyToken,(req,res) => {
     Order.setOrder(req,res)
 })
 
-router.get('/getorders',(req,res) => {
+router.get('/getorders',verfifyToken,(req,res) => {
     Order.getOrders(req,res)
 })
 
 // User Route APis
 
 /* Get Profile Info */
-router.get('/profile', (req, res) => {
+router.get('/profile',verfifyToken, (req, res) => {
 try {
   var email = stringUtil.sanitizeInput(req.query.email,true)
     User.findOne({email: email}).exec(function(err,userProfile){
@@ -63,7 +71,7 @@ try {
 }
 })
 
-router.post('/profile',(req,res)=>{
+router.post('/profile',verfifyToken,(req,res)=>{
     try{
     var userData = stringUtil.sanitizeInput(req.body,true)
     var email = stringUtil.sanitizeInput(req.body['email'],true)
@@ -81,7 +89,7 @@ router.post('/profile',(req,res)=>{
 }
 })
 
-router.post('/changepassword',(req,res)=>{
+router.post('/changepassword',verfifyToken,(req,res)=>{
     changePassword(req,res)
 })
 
@@ -116,7 +124,6 @@ var changePassword = async function changePassword(req,res){
 router.post('/register',(req,res)=>{
    var userData = req.body
    var user = new User(userData)
-  
    user.save((error,registeredUser) => {
     try{
        if(error){
@@ -124,14 +131,15 @@ router.post('/register',(req,res)=>{
        }else {
            var payload = {subject: user._id}
            var token = jwt.sign(payload, 'secretkey')
-         /*  transporter.sendMail(mailOptions, function(error, info){
+           
+           mailOptions.to = email
+          transporter.sendMail(mailOptions, function(error, info){
             if (error) {
               console.log(error);
             } else {
                 res.status(201).send({token})
             }
-          }); */
-          res.status(201).send({token})
+          });
            
        }
     } catch(error){
@@ -154,16 +162,6 @@ router.post('/login',(req,res)=>{
                if( user.password !== userData.password){
                    res.status(401).send({"ErrorCode": "401" ,  "ErrorMsg":"Invalid Password"})              
                 } else {
-                    /*
-                       transporter.sendMail(mailOptions, function(error, info){
-                                if (error) {
-                                console.log(error);
-                                } else {
-                                console.log('mail gela re')
-                                   
-                                } 
-                                
-                            }); */
                             let payload = {subject: user._id}
                             let token = jwt.sign(payload, 'secretkey')         
                             res.status(200).send({"token":token, "userType":user.userType})
@@ -185,11 +183,17 @@ router.post('/login',(req,res)=>{
      var token = req.headers.authorization.split(' ')[1];
      if(token === null )
      {return res.status(401).send('Unauthorized Reguest');}
-     var payLoad = jwt.verify(token,'secretKey');
+     /*var payLoad = jwt.verify(token,'secretKey');
      if(!payLoad){
         return res.status(401).send('Unauthorized Reguest');
-     }
+     } 
+     console.log('hii payload',payLoad)
      req.userId = payLoad.subject;
+     */
+     jwt.verify(token, 'secretKey', function(err, decoded) {
+        // console.log(decoded) // bar
+      });
+     
      next()
  }
 
