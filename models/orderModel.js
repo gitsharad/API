@@ -12,9 +12,17 @@ const orderSchema = new schema ({
       type: String,
       trim:true
     },
+    projectDelivery:{
+      type: String,
+      trim:true
+    },
+    projectName:{
+      type: String,
+      trim:true
+    },
     productList: [{
         _id: false,
-        productId: {
+        productName: {
           type: String,
           required: true,
           trim: true
@@ -24,24 +32,39 @@ const orderSchema = new schema ({
           required: true,
           trim: true
         },
-        words: {
-          type: Number,
-          required: true,
-          trim: true
-        },
         rate: {
             type: Number,
             required: true,
             trim: true
           },
-        addon: {
-          type: String,
-          required: false,
-          trim: true
-        },
-        addonqty:{
-          type: Number
-        },
+        otherInfo:[
+           {
+            name:{
+              type: String,
+              required: true,
+              trim: true
+            },
+            words: {
+              type: Number,
+              required: true,
+              trim: true
+            },
+            addonInfo: [
+              {
+                name:{
+                type: String,
+                required: true,
+                trim: true
+              },
+              value:{
+                type: String,
+                required: true,
+                trim: true
+              }
+            }
+            ]
+           }
+         ],
         status: {
             type: String,
             required: true,

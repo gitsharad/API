@@ -47,6 +47,7 @@ router.get('/addproduct', (req, res) => {
 
 // Orders Apis
 router.post('/addorder',verfifyToken,(req,res) => {
+    console.log('hiiiisdfjsdlkjflksdjfklsdjflksdjflksdj')
     Order.setOrder(req,res)
 })
 
