@@ -56,8 +56,48 @@ var getOrders = async function getOrders(req,res){
     }
      
   }
+
+  var updateOrder = async function updateOrder(req,res){
+    try {
+      let orderId = ''
+      let orderStatus = ''
+      let subOrderId =''
+      
+      if(req.params['orderId']){
+        orderId = stringUtil.sanitizeInput(req.params['orderId'],false)
+      } else {
+        return res.status(400).send({"ErrorCode":"Invalid Param Error" ,  "ErrorMsg":"OrderId Is Required"})  
+      }
+      if(req.params['subOrderId']){
+        subOrderId = stringUtil.sanitizeInput(req.params['subOrderId'],false)
+      } else {
+        return res.status(400).send({"ErrorCode":"Invalid Param Error" ,  "ErrorMsg":"SuborderId Is Required"})  
+      }
+
+      if(req.query['status']){
+        orderStatus = stringUtil.sanitizeInput(req.query['status'],true)
+      } else {
+        return res.status(400).send({"ErrorCode":"Invalid Param Error" ,  "ErrorMsg":"Status Is Required"})  
+      }
+      query = { 'orderId':orderId, "productList": { $elemMatch: { subOrderId:  subOrderId } } }
+      upsertData = {'productList.$.status': orderStatus}
+      var updateOrderData = await Order.updateOne(query, { $set: upsertData })
+      if(updateOrderData){
+        res.status(201).send({updateOrderData})
+      } else {
+        console.log('error in inner try',error)
+        res.status(400).send({"ErrorCode": "400" ,  "ErrorMsg":"something went wrong" })
+      }
+     
+    } catch (error) {
+      console.log('error in main try',error)
+      res.status(500).send({"ErrorCode": "500" ,  "ErrorMsg":"Internal Server Error" })
+    }
+     
+  }
   
   module.exports = {
       getOrders: getOrders,
-      setOrder: setOrder
+      setOrder: setOrder,
+      updateOrder: updateOrder
   }

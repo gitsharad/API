@@ -37,7 +37,9 @@ const UserSchema = new schema ({
         }
       }],
       yearofexp:String,
-      highestdegree:String
+      highestdegree:String,
+      resetPasswordToken: String,
+      resetPasswordExpires: Date
 })
 
 module.exports = mongoose.model('user', UserSchema,'users')

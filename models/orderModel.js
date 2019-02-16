@@ -4,7 +4,7 @@ shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWX
 const schema = mongoose.Schema
 
 const orderSchema = new schema ({
-    _id: {
+    orderId: {
       default:shortid.generate(),
       type: String
        },
@@ -21,7 +21,10 @@ const orderSchema = new schema ({
       trim:true
     },
     productList: [{
-        _id: false,
+      subOrderId: {
+        default:shortid.generate(),
+        type: String
+         },
         productName: {
           type: String,
           required: true,
