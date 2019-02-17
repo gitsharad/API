@@ -42,6 +42,14 @@ router.post('/forgot/:email',verfifyToken,(req,res) =>{
     UserRoute.forgotPassword(req,res)
 })
 
+router.get('/reset/:token',verfifyToken,(req,res) =>{
+    UserRoute.resetPasswordTokenCheck(req,res)
+})
+
+router.post('/reset/:token',verfifyToken,(req,res) =>{
+    UserRoute.resetPassword(req,res)
+})
+
 /* Get Profile Info */
 router.get('/profile',verfifyToken, (req, res) => {
 UserRoute.getProfileData(req,res)
