@@ -69,7 +69,8 @@ function forgotPassword(req,res){
           'If you did not request this, please ignore this email and your password will remain unchanged.\n'
 
           transporter.sendMail(mailOptions, function(err) {
-           
+            console.log('error',err)
+            logger.info('mail sent Successfully',user.email)
           });
         }
       ], function(err) {
@@ -79,14 +80,14 @@ function forgotPassword(req,res){
             logger.error(loggerUtil.createLoggerMessage(module, err))
             return next(err);
         }
-        return res.status(200).send({"token":token}) 
         
       });
-    //res.status(200).send(email)
+    res.status(200).send({'email':email})
 }
 
 function resetPasswordTokenCheck(req,res){
     UserModel.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+        
         if (!user) {
           res.status(401).send({"ErrorCode": "401" ,  "ErrorMsg":"Password reset token is invalid or has expired."})
         }
@@ -123,6 +124,7 @@ function resetPasswordTokenCheck(req,res){
           mailOptions.subject = 'Your password has been changed'
           mailOptions.text = 'Hello,\n\n' +
           'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+          res.status(200).send({"token":req.params.token})
           transporter.sendMail(mailOptions, function(err) {
             done(err);
           });
@@ -130,10 +132,12 @@ function resetPasswordTokenCheck(req,res){
       ], function(err) {
         console.log('error',err)
         logger.error(loggerUtil.createLoggerMessage(module, err))
-        return res.status(200).send({"token":req.params.token})
+        
       });
      
 }
+
+
 
 //Login Api
 

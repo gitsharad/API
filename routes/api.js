@@ -5,11 +5,16 @@ const jwt = require('jsonwebtoken')
 const product = require('./product')
 const Order = require('./orders')
 const UserRoute= require('./user')
+const paypalGateway= require('./paypalGateway')
 
 router.get('/', (req, res) => {
     res.send('From API Route')
 })
 
+//Paypal Apis 
+router.post('/pay',(req,res)=>{
+paypalGateway.paypalPay(req,res)
+})
  
 // Product Apis
 router.get('/products', (req, res) => {
@@ -18,6 +23,14 @@ router.get('/products', (req, res) => {
 
 router.get('/addproduct', (req, res) => {
     product.setProduct(req,res)
+})
+
+router.delete('/deleteproduct/:productId', (req, res) => {
+    product.deleteProduct(req,res)
+})
+
+router.put('/updateproduct/:productId', (req, res) => {
+    product.updateProduct(req,res)
 })
 
 // Orders Apis
@@ -30,14 +43,12 @@ router.put('/updateOrder/:orderId/:subOrderId',verfifyToken,(req,res) => {
     Order.updateOrder(req,res)
 })
 
-
 router.get('/getorders',verfifyToken,(req,res) => {
     Order.getOrders(req,res)
 })
 
 
 // User Route APis
-
 router.post('/forgot/:email',verfifyToken,(req,res) =>{
     UserRoute.forgotPassword(req,res)
 })

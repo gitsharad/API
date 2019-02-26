@@ -21,6 +21,7 @@
     "lodash": "4.17.11",
     "mongoose": "5.2.12",
     "nodemailer": "4.6.8",
+    "paypal-rest-sdk": "^1.8.1",
     "regexp-quote": "0.0.0",
     "shortid": "2.2.14",
     "winston": "^3.2.1",

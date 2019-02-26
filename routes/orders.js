@@ -36,7 +36,19 @@ var getOrders = async function getOrders(req,res){
       } else {
         return res.status(400).send({"ErrorCode":"Invalid Param Error" ,  "ErrorMsg":"Email Id Is Required"})  
       }
-      
+
+      //order input 
+      if(req.body['projectDelivery']){
+        orderData.projectDelivery = stringUtil.sanitizeInput(req.body['projectDelivery'],false)
+      } else {
+        return res.status(400).send({"ErrorCode":"Invalid Param Error" ,  "ErrorMsg":"projectDelivery Id Is Required"})  
+      }
+
+      if(req.body['projectName']){
+        orderData.projectName = stringUtil.sanitizeInput(req.body['projectName'],false)
+      } else {
+        return res.status(400).send({"ErrorCode":"Invalid Param Error" ,  "ErrorMsg":"projectName Id Is Required"})  
+      }
       let order = new Order(orderData)
       order.save((error,_id) => {
         try{
