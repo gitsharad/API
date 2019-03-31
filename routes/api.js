@@ -4,6 +4,7 @@ const mongoose = require('../helper/db')
 const jwt = require('jsonwebtoken')
 const product = require('./product')
 const Order = require('./orders')
+const Sample = require('./samples')
 const UserRoute= require('./user')
 const paypalGateway= require('./paypalGateway')
 
@@ -47,6 +48,10 @@ router.get('/getorders',verfifyToken,(req,res) => {
     Order.getOrders(req,res)
 })
 
+// Samples Apis 
+router.post('/addsamples',verfifyToken,(req,res) => {
+    Sample.addSamples(req,res)
+})
 
 // User Route APis
 router.post('/forgot/:email',verfifyToken,(req,res) =>{

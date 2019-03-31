@@ -39,7 +39,57 @@ const UserSchema = new schema ({
       yearofexp:String,
       highestdegree:String,
       resetPasswordToken: String,
-      resetPasswordExpires: Date
+      resetPasswordExpires: Date,
+      address:[{
+        _id:false,
+        address1:{
+          type:String,
+          require:true,
+          trim:true
+        },
+        address2:{
+          type:String,
+          require:true,
+          trim:true
+        },
+        country:{
+          type:String,
+          require:true,
+          trim:true
+        },
+        state:{
+          type:String,
+          require:true,
+          trim:true
+        },
+        zip:{
+          type:Number,
+          require:true,
+          trim:true
+        }
+      }],
+      CardInfo:{
+        cardName:{
+          type:String,
+          require:true,
+          trim:true
+        },
+        cardNumber:{
+          type:String,
+          require:true,
+          trim:true
+        },
+        expiration:{
+          type:String,
+          require:true,
+          trim:true
+        },
+        cvvNumber:{
+          type:String,
+          require:true,
+          trim:true
+        }
+      }
 })
 
 module.exports = mongoose.model('user', UserSchema,'users')

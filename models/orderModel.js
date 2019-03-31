@@ -35,11 +35,6 @@ const orderSchema = new schema ({
           required: true,
           trim: true
         },
-        rate: {
-            type: Number,
-            required: true,
-            trim: true
-          },
         otherInfo:[
            {
             name:{
@@ -71,7 +66,8 @@ const orderSchema = new schema ({
         status: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
+            default: "ordered"
           }
       }]
 })

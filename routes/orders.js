@@ -2,20 +2,39 @@ const Order = require('../models/orderModel')
 const stringUtil = require('../helper/stringUtil')
 
 var getOrders = async function getOrders(req,res){
+
     try {
-      let email
-      if(req.headers['email']){
-        email = stringUtil.sanitizeInput(req.headers['email'],true)
+      let filters = {}
+      if(req.query['email']){
+        filters['email'] = stringUtil.sanitizeInput(req.query['email'],true)
+      }
+      if(req.query['status']){
+        filters['status'] = stringUtil.sanitizeInput(req.query['status'],true)
       } else {
-        return res.status(400).send({"ErrorCode":"Invalid Param Error" ,  "ErrorMsg":"Email Id Is Required"})  
+        return res.status(400).send({"ErrorCode":"Invalid Param Error" ,  "ErrorMsg":"status Is Required"})  
       } 
-     
-        let orders = await Order.find({'email':email})
-        if(orders) {
-          res.status(200).send(orders)
-        } else {
-          res.status(200).send([])
-        }
+      
+      Order.aggregate([
+            { "$match": filters },
+            { "$lookup": 
+                       {
+                    "from": "samples",
+                    "localField": "orderId",
+                    "foreignField": "orderId",
+                    "as": "orderSamples"
+                      }
+            }
+        ]).exec((err, orders) => {
+            if (err) throw err;
+            if(orders) {
+              res.status(200).send(orders)
+            } else {
+              res.status(200).send([])
+            }
+        })
+      
+       /* let orders = await Order.find(filters)
+         */
         
     } catch (error) {
       res.status(500).send({"ErrorCode": "500" ,  "ErrorMsg":"Internal Server Error" })
@@ -49,10 +68,15 @@ var getOrders = async function getOrders(req,res){
       } else {
         return res.status(400).send({"ErrorCode":"Invalid Param Error" ,  "ErrorMsg":"projectName Id Is Required"})  
       }
+      let billingInfo = orderData['billingInfo']
+      delete orderData['billingInfo']
       let order = new Order(orderData)
+      console.log('req',orderData)
+      
       order.save((error,_id) => {
         try{
            if(error){
+             console.log('sdjflksdjflksdjf',error)
             res.status(400).send({"ErrorCode":error.name ,  "ErrorMsg":error._message})
            }else {
             res.status(201).send({_id})

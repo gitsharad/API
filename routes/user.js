@@ -69,7 +69,6 @@ function forgotPassword(req,res){
           'If you did not request this, please ignore this email and your password will remain unchanged.\n'
 
           transporter.sendMail(mailOptions, function(err) {
-            console.log('error',err)
             logger.info('mail sent Successfully',user.email)
           });
         }
