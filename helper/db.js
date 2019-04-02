@@ -9,3 +9,5 @@ mongoose.connect(db, err => {
         console.log('connected to mongoDB')
     }
 })
+
+mongoose.set('debug', true);

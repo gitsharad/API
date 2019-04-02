@@ -12,7 +12,8 @@ var ignoreCase = function ignoreCase (msg, strictCheck) {
 var sanitizeInput = function sanitizeInput (input, upperCase) {
   if (_.isObject(input)) {
     var upperObj = _.transform(input, function (result, val, key) {
-       if (!(typeof val === 'number' || typeof input === 'boolean' || input !== null)) {
+      
+      if (!(typeof val === 'number' || typeof val === 'boolean' || val === null ||  typeof val === 'object')) {
         result[key] = upperCase ? val.trim().toUpperCase() : val.trim()
       } else {
         result[key] = val
@@ -21,7 +22,7 @@ var sanitizeInput = function sanitizeInput (input, upperCase) {
     })
     return upperObj
   } else {
-    if (!(typeof input === 'number' || typeof input === 'boolean' || input !== null)) {
+    if (!(typeof input === 'number' || typeof input === 'boolean' || input === null)) {
       return upperCase ? input.trim().toUpperCase() : input.trim()
     } else {
       return input

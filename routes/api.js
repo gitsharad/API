@@ -53,6 +53,10 @@ router.post('/addsamples',verfifyToken,(req,res) => {
     Sample.addSamples(req,res)
 })
 
+router.put('/acceptsample/:email/:orderId',verfifyToken,(req,res) => {
+    Sample.acceptSample(req,res)
+})
+
 // User Route APis
 router.post('/forgot/:email',verfifyToken,(req,res) =>{
     UserRoute.forgotPassword(req,res)
