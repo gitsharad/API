@@ -62,14 +62,15 @@ const orderSchema = new schema ({
             }
             ]
            }
-         ],
-        status: {
-            type: String,
-            required: true,
-            trim: true,
-            default: "ordered"
-          }
-      }]
+         ]
+        
+      }],
+      status: {
+        type: String,
+        required: true,
+        trim: true,
+        default: "ORDERED"
+      }
 })
 
 module.exports = mongoose.model('order', orderSchema,'orders')

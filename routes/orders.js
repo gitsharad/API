@@ -71,7 +71,6 @@ var getOrders = async function getOrders(req,res){
       let billingInfo = orderData['billingInfo']
       delete orderData['billingInfo']
       let order = new Order(orderData)
-      console.log('req',orderData)
       
       order.save((error,_id) => {
         try{
